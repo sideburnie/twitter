@@ -1,0 +1,21 @@
+{
+  "name": "twitter",
+  "version": "0.0.1",
+  "description": "twitter notifications",
+  "main": "notifyFollowers.js",
+  "dependencies": {
+      "twit": "latest",
+      "nodemailer": "latest",
+      "twitter": "latest"
+    },
+  "devDependencies": {},
+  "scripts": {
+      "test": "node_modules/.bin/jshint ."
+    },
+  "author": "",
+  "license": "closed source",
+  "jshintConfig": {
+      "node": true
+    }
+}
+
