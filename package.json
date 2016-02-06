@@ -4,7 +4,6 @@
   "description": "twitter notifications",
   "main": "notifyFollowers.js",
   "dependencies": {
-      "twit": "latest",
       "nodemailer": "latest",
       "twitter": "latest"
     },

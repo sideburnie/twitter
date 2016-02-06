@@ -1,6 +1,5 @@
 "use strict"
 
-var Twit = require('twit');
 var Twitter = require('twitter');
 var sendEmail = require('./email.js');
 var config = require('./config.js');
@@ -33,6 +32,11 @@ function getFollowers(T) {
   })
 }
 
+function printArrayTypes(array, arrayName) {
+  var arrayString = array.map(e => { return typeof(e) });
+  console.log("types for " + arrayName + ": " + arrayString);
+}
+
 function notify(emailOptions, message) {
   let localEmailOptions = JSON.parse(JSON.stringify(emailOptions));
   localEmailOptions.htmlMessage = message;
@@ -43,8 +47,8 @@ function notify(emailOptions, message) {
 
 function getFollowerFromIds(T, ids) {
   return new Promise((resolve, reject) => { 
-    console.log('looking up user ids: ' + ids);
-    T.get('users/lookup', { user_id: ids },  function (err, data, response) {
+    console.log('looking up user ids: ' + ids + ', typeof id: ' + typeof(ids.toString()));
+    T.get('users/lookup', { user_id: ids.toString() },  function (err, data, response) {
       if (err) {
         console.log('err: ' + JSON.stringify(err));
         return reject(new Error(err));
@@ -62,25 +66,31 @@ function getFollowerFromIds(T, ids) {
 
 var checkNotify = async(function* (T, followersList, emailOptions) {
   try {
-    let latestIds = yield getFollowers(T);
-    //console.log('\r\ngot latestIds: ' + latestIds + '\r\nfollowersList: ' + followersList);
+    var latestIds = yield getFollowers(T);
+    // printArrayTypes(latestIds, 'fresh idStrings');
+    // printArrayTypes(followersList, 'followersList');
+    // console.log('\r\ngot latestIds: ' + latestIds + '\r\nfollowersList: ' + followersList);
     let follows = latestIds.subtract(followersList);
     let unfollows = followersList.subtract(latestIds);
-    // let follows = latestIds.filter(id => { return !followersList.has(id); });
-    // let unfollows = followersList.filter(id => { return !latestIds.has(id); });
-    console.log('\r\n got follows: ' + follows + '\r\nunfollows: ' + unfollows);
-    console.log('typeof 1: ' + typeof(latestIds[0]) + ', ' + latestIds[0]);
-    console.log('typeof 2: ' + typeof(followersList[0]) + ', ' + followersList[0]);
-    // let follows = getNewFollows(followersList, latestIds);
-    // let unfollows = getUnfollows(followersList, latestIds);
+    // console.log('\r\ngot follows: ' + follows + '\r\nunfollows: ' + unfollows);
     let notificationMessage = {};
     if (follows && follows.length > 0) {
-      console.log('found new follows' + follows);
+      console.log('found new follows: ' + follows);
       notificationMessage.followProfiles = yield getFollowerFromIds(T, follows);
+      follows.map(e => { followersList.push(e); })
     }
     if (unfollows && unfollows.length > 0) {
-      console.log('found new unfollows' + unfollows);
+      console.log('found new unfollows: ' + unfollows);
       notificationMessage.unfollowProfiles = yield getFollowerFromIds(T, unfollows);
+      for (let i = 0, ulen = unfollows.length; i < ulen; i++) {
+        for (let j = 0, flen = followersList.length; j < flen; j++) {
+          if (followersList[j] == unfollows[i]) {
+            console.log('removing unfollows: ' + unfollows[i] + 
+              ' == followersList: ' + followersList[j]);
+            followersList.splice(j, 1);
+          }
+        }
+      }
     }
     if (Object.keys(notificationMessage).length > 0) {
       console.log('found changes in followers list: ' + JSON.stringify(notificationMessage));
@@ -97,7 +107,7 @@ var checkNotify = async(function* (T, followersList, emailOptions) {
 function notificationLoop(T, followersList, emailOptions, checkIntervalSeconds) {
   console.log('setup to check api every ' + checkIntervalSeconds + ' seconds')
   setInterval(() => {
-    console.log('checking followers');
+    console.log((new Date()).toString() + ' checking followers');
     checkNotify(T, followersList, emailOptions);
   }, checkIntervalSeconds * 1000);
 }
@@ -117,17 +127,6 @@ var testNotify = async(function* (T, ids, emailOptions) {
 function main() {
  
   console.log('starting, using config: ' + JSON.stringify(config));
-  // var followers1 = [1,2,3,4,5,6].subtract( [3,5,4] ); 
-  // var followers2 = [1,2,3,4,5,6].subtract( [1,2,3,4,6,5] );
-  // console.log('subtract: ' + followers1);
-  // console.log('subtract: ' + followers2);
-
-  // var T = new Twit({
-  //     consumer_key:         config.twitOptions.consumer_key
-  //   , consumer_secret:      config.twitOptions.consumer_secret
-  //   , access_token:         config.twitOptions.access_token
-  //   , access_token_secret:  config.twitOptions.access_token_secret
-  // })
   var T = new Twitter({
       consumer_key:         config.twitOptions.consumer_key
     , consumer_secret:      config.twitOptions.consumer_secret
@@ -135,18 +134,18 @@ function main() {
     , access_token_secret:  config.twitOptions.access_token_secret
   });
   //testNotify(T, [1026, 160763], config.emailOptions);
-  var initialFollowers = []
-  getFollowers(T)
-    .then(res => { 
-      initialFollowers = res; 
-      console.log('initial followers ids: ' + res); 
-      return initialFollowers;
-    })
-    .then(res => {
-      getFollowerFromIds(T, res[0])
-        .then(res => console.log('res: ' + JSON.stringify(res)))
-    })
-    .catch(err => console.log('err: ' + err.stack));
+  // var initialFollowers = []
+  // getFollowers(T)
+  //   .then(res => { 
+  //     initialFollowers = res; 
+  //     console.log('initial followers ids: ' + res); 
+  //     return initialFollowers;
+  //   })
+  //   .then(res => {
+  //     getFollowerFromIds(T, res[0])
+  //       .then(res => console.log('res: ' + JSON.stringify(res)))
+  //   })
+  //   .catch(err => console.log('err: ' + err.stack));
 
   getFollowers(T)
     .then(initialFollowers => { 
@@ -163,14 +162,6 @@ function main() {
     .catch(err => {
       console.log('failed in main: ' + err.stack);
     })
-
-  // .then(res => followerIdList.push(res))
-  // .then(() => {
-  // .catch(err => console.log(err.stack))
-  //   
-  // })
-  // var followerFromID = getFollowerFromIds(T, [1026, 15508941]);
-  // var followerFromID = getFollowerFromId(T, '15508941');
 }
 
 if (require.main === module) {
