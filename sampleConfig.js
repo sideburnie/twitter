@@ -19,6 +19,7 @@ var config = {
     , access_token:         ''
     , access_token_secret:  ''
   },
-  checkIntervalSeconds: 180 
+  checkIntervalSeconds: 180,
+  screenName: ''
 }
 module.exports = config

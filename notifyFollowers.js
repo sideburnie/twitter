@@ -9,9 +9,9 @@ Array.prototype.subtract = function(a) {
     return this.filter(function(i) { return a.indexOf(i) === -1; });
 };
 
-function getFollowers(T) {
+function getFollowers(T, screenName) {
   return new Promise((resolve, reject) => {
-    T.get('followers/ids', { screen_name: 'BernieRihn' },  function (err, data, response) {
+    T.get('followers/ids', { screen_name: screenName },  function (err, data, response) {
       if (err) {
         console.log('err: ' + JSON.stringify(err));
         return reject(new Error(err));
@@ -64,9 +64,9 @@ function getFollowerFromIds(T, ids) {
   });
 }
 
-var checkNotify = async(function* (T, followersList, emailOptions) {
+var checkNotify = async(function* (T, followersList, emailOptions, screenName) {
   try {
-    var latestIds = yield getFollowers(T);
+    var latestIds = yield getFollowers(T, screenName);
     // printArrayTypes(latestIds, 'fresh idStrings');
     // printArrayTypes(followersList, 'followersList');
     // console.log('\r\ngot latestIds: ' + latestIds + '\r\nfollowersList: ' + followersList);
@@ -135,7 +135,7 @@ function main() {
   });
   //testNotify(T, [1026, 160763], config.emailOptions);
   // var initialFollowers = []
-  // getFollowers(T)
+  // getFollowers(T, config.screenName)
   //   .then(res => { 
   //     initialFollowers = res; 
   //     console.log('initial followers ids: ' + res); 
@@ -147,7 +147,7 @@ function main() {
   //   })
   //   .catch(err => console.log('err: ' + err.stack));
 
-  getFollowers(T)
+  getFollowers(T, config.screenName)
     .then(initialFollowers => { 
       console.log('initial followers ids: ' + initialFollowers);
       if (initialFollowers && initialFollowers.length > 0) {
