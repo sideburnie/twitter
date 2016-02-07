@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 var nodemailer = require('nodemailer');
  
@@ -29,7 +29,7 @@ function sendEmail(options) {
       subject: options.subject,
       text: options.plaintextMessage,
       html: options.htmlMessage
-    }
+    };
     console.log('OPTIONS: ' + JSON.stringify(options));
     console.log('MAILOPTIONS: ' + JSON.stringify(mailOptions));
     var smtpConfig = {
@@ -40,7 +40,7 @@ function sendEmail(options) {
            user: options.user + '@' + options.emailDomain,
            pass: options.pass
          } 
-    }
+    };
     console.log('SMTP CONFIG: ' + JSON.stringify(smtpConfig));
     var transporter = nodemailer.createTransport(smtpConfig);
     transporter.sendMail(mailOptions, (error, info) => {

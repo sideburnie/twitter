@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 var Twitter = require('twitter');
 var sendEmail = require('./email.js');
@@ -28,12 +28,12 @@ function getFollowers(T, screenName) {
       } else {
         return reject(new Error('returned null list of followers!'));
       }
-    })
-  })
+    });
+  });
 }
 
 function printArrayTypes(array, arrayName) {
-  var arrayString = array.map(e => { return typeof(e) });
+  var arrayString = array.map(e => { return typeof(e); });
   console.log("types for " + arrayName + ": " + arrayString);
 }
 
@@ -57,7 +57,7 @@ function getFollowerFromIds(T, ids) {
         console.log('follower ' + JSON.stringify(data, null, 2) + ' from ids: ' + ids);
         resolve(data);
       } else {
-        console.log('got null data from user lookup api');
+        console.log('got null data from user lookup api, response: ' + response);
         resolve([]);
       }
     });
@@ -77,7 +77,7 @@ var checkNotify = async(function* (T, followersList, emailOptions, screenName) {
     if (follows && follows.length > 0) {
       console.log('found new follows: ' + follows);
       notificationMessage.followProfiles = yield getFollowerFromIds(T, follows);
-      follows.map(e => { followersList.push(e); })
+      follows.map(e => { followersList.push(e); });
     }
     if (unfollows && unfollows.length > 0) {
       console.log('found new unfollows: ' + unfollows);
@@ -105,7 +105,7 @@ var checkNotify = async(function* (T, followersList, emailOptions, screenName) {
 });
 
 function notificationLoop(T, followersList, emailOptions, checkIntervalSeconds) {
-  console.log('setup to check api every ' + checkIntervalSeconds + ' seconds')
+  console.log('setup to check api every ' + checkIntervalSeconds + ' seconds');
   setInterval(() => {
     console.log((new Date()).toString() + ' checking followers');
     checkNotify(T, followersList, emailOptions);
@@ -128,10 +128,10 @@ function main() {
  
   console.log('starting, using config: ' + JSON.stringify(config));
   var T = new Twitter({
-      consumer_key:         config.twitOptions.consumer_key
-    , consumer_secret:      config.twitOptions.consumer_secret
-    , access_token_key:     config.twitOptions.access_token
-    , access_token_secret:  config.twitOptions.access_token_secret
+      consumer_key:         config.twitOptions.consumer_key,
+      consumer_secret:      config.twitOptions.consumer_secret,
+      access_token_key:     config.twitOptions.access_token,
+      access_token_secret:  config.twitOptions.access_token_secret
   });
   //testNotify(T, [1026, 160763], config.emailOptions);
   // var initialFollowers = []
@@ -161,7 +161,7 @@ function main() {
     })
     .catch(err => {
       console.log('failed in main: ' + err.stack);
-    })
+    });
 }
 
 if (require.main === module) {

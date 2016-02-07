@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 var config = {
   emailOptions: {
@@ -14,12 +14,12 @@ var config = {
     htmlMessage: ''
   }, 
   twitOptions: {
-      consumer_key:         ''
-    , consumer_secret:      ''
-    , access_token:         ''
-    , access_token_secret:  ''
+      consumer_key:         '',
+      consumer_secret:      '',
+      access_token:         '',
+      access_token_secret:  ''
   },
   checkIntervalSeconds: 180,
   screenName: ''
-}
-module.exports = config
+};
+module.exports = config;
