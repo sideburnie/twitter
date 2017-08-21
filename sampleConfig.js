@@ -2,17 +2,17 @@
 
 var config = {
   emailOptions: {
-    user: 'robot',
+    user: 'alerts.bernie.rihn',
     pass: '',
-    emailDomain: 'hashplex.com',
+    emailDomain: 'gmail.com',
     mailServerFqdn: 'smtp.gmail.com',
     mailServerPort: 465,
-    fromEmail: 'robot@hashplex.com',
-    toEmail: '',
+    fromEmail: 'alerts.bernie.rihn@gmail.com',
+    toEmail: 'bernie.rihn@gmail.com',
     subject: 'UNFOLLOWED AGAIN',
     plaintextMessage: '',
     htmlMessage: ''
-  }, 
+  },
   twitOptions: {
       consumer_key:         '',
       consumer_secret:      '',
